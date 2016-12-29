@@ -1,4 +1,5 @@
 import argparse
+import string
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--roomFile', type=str)
@@ -9,9 +10,15 @@ roomFile = open(args.roomFile, 'r')
 testRooms = roomFile.readlines()
 sectorSum = 0
 
+def right_caeser(encodedLetter, rotate):
+	startCode = string.ascii_lowercase.index(encodedLetter)
+	endCode = (startCode + rotate) % 26
+	return string.ascii_lowercase[endCode]
+
 for room in testRooms:
 	letterCount = {'a':0}
 	validChecksum = True
+	decodedName = ''
 
 	nameChunks = room.split('-')
 	sectorAndChecksum = nameChunks.pop().rstrip("\r\n")
@@ -28,6 +35,7 @@ for room in testRooms:
 			letterCount[c] += 1
 		else :
 			letterCount[c] = 1
+		decodedName += right_caeser(c,int(sector))
 
 	# print(letterCount)
 	letterSort = sorted(letterCount.items(), key = lambda x: x[0])
@@ -41,5 +49,7 @@ for room in testRooms:
 
 	if validChecksum:
 		sectorSum += int(sector)
+		if 'northpole' in decodedName:
+			print('North Pole objects found in sector ' + sector)
 
 print('sectorSum = ' + str(sectorSum))
